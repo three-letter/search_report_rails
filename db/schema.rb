@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20130514012923) do
+ActiveRecord::Schema.define(:version => 20130514075455) do
 
   create_table "domains", :force => true do |t|
     t.string   "name"
@@ -30,6 +30,14 @@ ActiveRecord::Schema.define(:version => 20130514012923) do
     t.integer  "domain_id"
     t.datetime "created_at",      :null => false
     t.datetime "updated_at",      :null => false
+  end
+
+  create_table "search_keyword_statistics", :force => true do |t|
+    t.string   "search_keyword"
+    t.integer  "search_count"
+    t.integer  "domain_id"
+    t.datetime "created_at",     :null => false
+    t.datetime "updated_at",     :null => false
   end
 
   create_table "search_logs", :force => true do |t|
