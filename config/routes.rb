@@ -1,4 +1,10 @@
 Search::Application.routes.draw do
+
+  get "result_browse_logs/create"
+
+	resources :search_logs
+	resources :result_browse_logs
+
   # The priority is based upon order of creation:
   # first created -> highest priority.
 
