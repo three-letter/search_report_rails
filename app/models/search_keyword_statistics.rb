@@ -3,9 +3,12 @@ class SearchKeywordStatistics < ActiveRecord::Base
 
 	belongs_to :domain
 
+	class << self
+		
+		def exist?(did,keyword)
+			!find_by_domain_id_and_search_keyword(did,keyword).blank?
+		end
 
-	def self.statistics_log_by_date date
-			
 	end
 
 end
