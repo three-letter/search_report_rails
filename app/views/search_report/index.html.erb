@@ -1,0 +1,54 @@
+
+<h2 style="text-align: center">Search Report</h2>
+
+<div class="form-inline">
+	<%= select_tag "domain_id", options_from_collection_for_select(@domains, 'id', 'name') %>
+	<input type="text" name="start_date" class="input-small" placeholder="start_date">
+	<input type="text" name="end_date" class="input-small" placeholder="end_date">
+	<button type="buttom" class="btn">确定</button>
+</div>
+
+<div id="chart" style="margin-top: 60px">
+	<svg style="height:360px"></svg>
+</div>
+
+<script type="text/javascript">
+	nv.addGraph(function() {  
+var chart = nv.models.lineChart().showLegend(false);
+
+chart.xAxis
+.axisLabel('Time (ms)')
+.tickFormat(function(d) {
+return d3.time.format('%x')(new Date(d))
+});;
+
+chart.yAxis
+.axisLabel('Voltage (v)');
+
+d3.select('#chart svg')
+.datum(sinAndCos())
+.transition().duration(500)
+.call(chart);
+
+nv.utils.windowResize(function() { d3.select('#chart svg').call(chart) });
+
+return chart;
+});
+	
+
+	function sinAndCos() {
+	var sin = [];
+	<% @datas.each do |k, v| %>
+		sin.push({x: <%= k %>, y: <%= v %>});
+	<% end %>
+	
+return [
+	{
+		values: sin,
+		key: 'Sine Wave A',
+		color: '#ff7f0e'
+	}
+];
+}
+
+</script>

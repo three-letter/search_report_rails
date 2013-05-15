@@ -11,9 +11,10 @@ class ResultBrowseLog < ActiveRecord::Base
 		
 		def statistics_position_by_date(date)
 			Domain.all.each do |d|
-				position_groups = d.result_browse_logs.select("result_position, COUNT(id) as count").group(:result_position)
+				position_groups = d.result_browse_logs.date_logs(date).select("result_position, COUNT(id) as count").group(:result_position)
 				position_groups.each do |position_group|
-					position_statistics = PositionStatistics.find_or_new_by_domain_id_and_position_and_created_at(d.id, position_group.result_position.to_i, date.beginning_of_day)
+					pos = position_group.result_position.to_i > 20 ? 21 : position_group.result_position.to_i
+					position_statistics = PositionStatistics.find_or_new_by_domain_id_and_position_and_created_at(d.id, pos, date.beginning_of_day)
 					position_statistics.count = position_statistics.count + position_group.count.to_i
 					position_statistics.save
 				end
@@ -21,7 +22,21 @@ class ResultBrowseLog < ActiveRecord::Base
 		end
 
 		def statistics_keyword_position_by_date(date)
-			
+			Domain.all.each do |d|
+				keyword_groups = d.result_browse_logs.date_logs(date).select("search_keyword, COUNT(id) as count").group(:search_keyword)
+				keyword_groups.each do |keyword_group|
+					1.upto(20) do |pos|
+						keyword_positions = d.result_browse_logs.date_logs(date).where(:search_keyword => keyword_group.search_keyword, :result_position => pos)
+						keyword_position_statistics = KeywordPositionStatistics.find_or_new_by_domain_id_and_keyword_and_position_and_date(d.id, keyword_group.search_keyword, pos, date.to_time)
+						keyword_position_statistics.count = keyword_position_statistics.count + keyword_positions.size
+						keyword_position_statistics.save
+					end
+					keyword_positions = d.result_browse_logs.date_logs(date).where(["search_keyword = ? and result_position > 20", keyword_group.search_keyword])
+					keyword_position_statistics = KeywordPositionStatistics.find_or_new_by_domain_id_and_keyword_and_position_and_date(d.id, keyword_group.search_keyword, 21, date.to_time)
+					keyword_position_statistics.count = keyword_position_statistics.count + keyword_positions.size
+					keyword_position_statistics.save
+				end
+			end
 		end
 		
 		def setup(date=(Date.today - 10).to_time)
