@@ -4,7 +4,10 @@ class Domain < ActiveRecord::Base
 	has_many :search_logs
 	has_many :result_browse_logs
 
-	def self.exist? domain_name
-		!find_by_name(domain_name).blank?
+	def self.find_or_new_by_name(domain_name)
+		domain = find_by_name(domain_name)
+		domain = create({:name => domain_name}) if domain.blank?
+		domain
 	end
+
 end

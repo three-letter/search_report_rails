@@ -6,12 +6,12 @@ describe Domain do
 		@domain = create(:domain)
 	end
 
-	it "should be return true if the domain exist" do
-		Domain.exist?(@domain.name).should be_true
+	it "should be return the domain if exist by name" do
+		Domain.find_or_new_by_name(@domain.name).id == @domain.id
 	end
 	
-	it "should be return false if the domain not exist" do
-		Domain.exist?(Time.now.to_i.to_s).should be_false
+	it "should be save new record if not exist by name" do
+		Domain.find_or_new_by_name(Time.now.to_i.to_s).id.should be_true
 	end
 
 end

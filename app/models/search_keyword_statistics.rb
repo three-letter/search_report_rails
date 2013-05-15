@@ -5,9 +5,11 @@ class SearchKeywordStatistics < ActiveRecord::Base
 
 	class << self
 		
-		def exist?(did,keyword)
-			!find_by_domain_id_and_search_keyword(did,keyword).blank?
-		end
+		def find_or_new_by_domain_id_and_search_keyword(did, keyword)
+			search_keyword_statistic = find_by_domain_id_and_search_keyword(did,keyword)
+			search_keyword_statistic = create({:domain_id => did, :search_keyword => keyword}) if search_keyword_statistic.blank?
+			search_keyword_statistic
+	  end
 
 	end
 

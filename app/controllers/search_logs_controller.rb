@@ -1,13 +1,10 @@
 class SearchLogsController < ApplicationController
 	
 	def create
-		domain_name = params[:domain]
-		domain = Domain.new({:name => domain_name})
-		domain = Domain.find_by_name(domain_name) if Domain.exist?(domain_name)
-		domain.save
+		domain = Domain.find_or_new_by_name(params[:domain])
 		respond_to do |format|
 			begin
-				search_log = domain.search_logs.build(merge_params(params))
+				search_log = domain.search_logs.build(merge_params)
 				msg = {}
 				if search_log.save
 					msg = {:code => 1, :msh => "save success"}
@@ -23,13 +20,13 @@ class SearchLogsController < ApplicationController
   end
 
 	private
-		def merge_params ps
+		def merge_params
 			{
-				:visit_id => ps[:visit_id],
-				:keyword => ps[:keyword],
-				:search_result_count => ps[:search_result_count],
-				:browser_type => ps[:browser_type],
-				:created_at => ps[:date].to_time
+				:visit_id => params[:visit_id],
+				:keyword => params[:keyword],
+				:search_result_count => params[:search_result_count],
+				:browser_type => params[:browser_type],
+				:created_at => params[:date].to_time
 			}
 		end
 
