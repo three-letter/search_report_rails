@@ -1,0 +1,16 @@
+
+
+<h2 style="text-align: center">Search Keyword Report</h2>
+
+<div class="form-inline">
+<form action="/search_keyword_report/show" method="post">
+<div style="margin-top:50px;" class="form-inline offset3">
+	<%= select_tag "domain_id", options_from_collection_for_select(@domains, 'id', 'name') %>
+	<input type="text" name="show_count" id="show_count" class="input-small" placeholder="show_count">
+	<button id="report_btn" type="buttom" class="btn">确定</button>
+</div>
+</form>
+<div id="chart" style="margin-top: 60px">
+	<%= high_chart("my_id4", @chart)  %>
+</div>
+

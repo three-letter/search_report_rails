@@ -3,6 +3,9 @@ class SearchKeywordStatistics < ActiveRecord::Base
 
 	belongs_to :domain
 
+	default_scope :order => "search_count DESC"
+	scope :top_count, lambda { |count| limit(count) }
+
 	class << self
 		
 		def find_or_new_by_domain_id_and_search_keyword(did, keyword)

@@ -11,13 +11,16 @@ class ResultBrowseLog < ActiveRecord::Base
 		
 		def statistics_position_by_date(date)
 			Domain.all.each do |d|
-				position_groups = d.result_browse_logs.date_logs(date).select("result_position, COUNT(id) as count").group(:result_position)
-				position_groups.each do |position_group|
-					pos = position_group.result_position.to_i > 20 ? 21 : position_group.result_position.to_i
+				1.upto(20) do |pos|
+					position_counts = d.result_browse_logs.date_logs(date).select("COUNT(id) as pos_count").where(:result_position => pos)
 					position_statistics = PositionStatistics.find_or_new_by_domain_id_and_position_and_created_at(d.id, pos, date.beginning_of_day)
-					position_statistics.count = position_statistics.count + position_group.count.to_i
+					position_statistics.count = position_statistics.count + position_counts[0].pos_count.to_i
 					position_statistics.save
 				end
+				position_counts = d.result_browse_logs.date_logs(date).select("COUNT(id) as pos_count").where(["result_position > ?", 20])
+				position_statistics = PositionStatistics.find_or_new_by_domain_id_and_position_and_created_at(d.id, 21, date.beginning_of_day)
+				position_statistics.count = position_statistics.count + position_counts[0].pos_count.to_i
+				position_statistics.save
 			end
 		end
 
@@ -38,6 +41,19 @@ class ResultBrowseLog < ActiveRecord::Base
 				end
 			end
 		end
+
+		def save_to_txt(date)
+			logs = date_logs(date)
+			return nil if logs.length == 0
+			separate = "    "
+			path = File.expand_path("../../..", __FILE__)
+			file_name = "result_browse_log_#{date.strftime('%Y-%m-%d')}.txt"
+			File.open("#{path}/public/db/#{file_name}", "w") do |f|
+				logs.each { |b| f.puts "#{b.visit_id}#{separate}#{b.created_at}#{separate}#{b.page}#{separate}#{b.position}#{separate}#{b.page_size}#{separate}#{b.result_position}#{separate}#{b.browser_type}#{separate}#{b.domain.name}#{separate}#{b.search_keyword}" }
+			end
+		end
+
+		# 测试环境下动态添加数据方法
 		
 		def setup(date=(Date.today - 10).to_time)
 			50.times do 

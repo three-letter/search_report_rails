@@ -21,12 +21,25 @@ class SearchLog < ActiveRecord::Base
 
 		def statistics_search_by_date(date)
 			Domain.all.each do |d|
-				keyword_groups = d.search_logs.date_log(date)
+				daily_logs = d.search_logs.date_log(date)
 				search_statistics = SearchStatistics.find_or_new_by_domain_id_and_created_at(d.id, date.to_time)
-				search_statistics.count = keyword_groups.size
+				search_statistics.count = daily_logs.size
 				search_statistics.save
 			end
 		end
+
+		def save_to_txt(date)
+			logs = date_log(date)
+			return nil if logs.length == 0
+			separate = "    "
+			path = File.expand_path("../../..", __FILE__)
+			file_name = "search_log_#{date.strftime('%Y-%m-%d')}.txt"
+			File.open("#{path}/public/db/#{file_name}", "w") do |f|
+				logs.each { |b| f.puts "#{b.visit_id}#{separate}#{b.created_at}#{separate}#{b.search_result_count}#{separate}#{b.browser_type}#{separate}#{b.domain.name}#{separate}#{b.keyword}" }
+			end
+		end
+	
+		# 测试环境下动态添加数据方法
 
 		def setup(date=(Date.today - 10).to_time)
 			50.times do 

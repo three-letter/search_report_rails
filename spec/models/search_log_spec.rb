@@ -34,6 +34,13 @@ describe SearchLog do
 			SearchStatistics.find_or_new_by_domain_id_and_created_at(@domain_id,@search_log.created_at.beginning_of_day).count == 1
 		end
 
+	context "save log to txt everyday" do
+		it "should generate a new file if save success" do
+			SearchLog.save_to_txt(Date.today)
+			File.exist?(File.expand_path("../../..", __FILE__) + "/public/db/search_log_#{Date.today.strftime('%Y-%m-%d')}.txt").should be_true
+		end
+	end
+
 	end
 
 end

@@ -1,5 +1,7 @@
 class SearchStatistics < ActiveRecord::Base
   attr_accessible :count, :domain_id, :created_at
+	
+	belongs_to :domain
 
 	def self.find_or_new_by_domain_id_and_created_at(did, date)
 		search_statistics = find_by_domain_id_and_created_at(did, date)

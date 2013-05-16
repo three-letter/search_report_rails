@@ -28,7 +28,7 @@ describe ResultBrowseLog do
 		it "should add new record after statistics position" do
 			expect {
 				ResultBrowseLog.statistics_position_by_date(Date.today)	
-			}.to change{PositionStatistics.count}.by(1)
+			}.to change{PositionStatistics.count}.by(21)
 		end
 
 		
@@ -42,6 +42,15 @@ describe ResultBrowseLog do
 				ResultBrowseLog.statistics_keyword_position_by_date(Date.today)	
 			}.to change{KeywordPositionStatistics.count}.by(21)
 		end
+
+		
+		context "save log to txt everyday" do
+			it "should generate a new file if save success" do
+				ResultBrowseLog.save_to_txt(Date.today)
+				File.exist?(File.expand_path("../../..", __FILE__) + "/public/db/result_browse_log_#{Date.today.strftime('%Y-%m-%d')}.txt").should be_true
+			end
+		end
+
 
 	end
 
