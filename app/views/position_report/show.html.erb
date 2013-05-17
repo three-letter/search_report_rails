@@ -9,7 +9,10 @@
 	<button id="report_btn" type="buttom" class="btn">确定</button>
 </div>
 </form>
-<div id="chart" style="margin-top: 60px">
+<div style="margin-top: 60px">
 	<%= high_chart("my_id4", @chart)  %>
 </div>
 
+<div style="margin-top: 60px">
+	<%= high_chart("my_id5", @pie_chart) unless @pie_chart.blank? %>
+</div>

@@ -1,3 +1,5 @@
+#coding: utf-8
+
 class PositionReportController < ApplicationController
   before_filter :init_params
 	
@@ -12,6 +14,24 @@ class PositionReportController < ApplicationController
 			f.options[:xAxis][:categories] = positions
 			f.options[:legend][:layout] = 'horizontal'
 			f.series(:type=> 'line',:name=> 'position',:data=> counts)
+		end
+
+		if position_counts.size > 20
+			pie_positions = ["1", "2-5", "6-10", "10-20", "大于20"]
+			pie_counts = [counts[0], counts[1,4].inject {|c1,c2| c1 + c2}, counts[5,5].inject{|c1,c2| c1 + c2}, counts[10,10].inject{|c1,c2| c1 + c2}, counts[20]] 
+			pie_datas = [] 
+			pie_positions.each_with_index do |pos, index|
+				pie_datas[index] = [pos, pie_counts[index]]	
+			end
+			@pie_chart = LazyHighCharts::HighChart.new('graph') do |f|
+				f.title({ :text=>"#{@domain.name} - #{params[:date]} - pie"})
+				f.plotOptions({
+					:pie => {
+						:dataLabels => { 
+							:format => "{point.name}: <b>{point.percentage}%</b>" }}	
+				})
+				f.series(:type=> 'pie',:name=> 'count',:data=> pie_datas)
+			end
 		end
   end
 
